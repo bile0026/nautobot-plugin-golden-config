@@ -73,7 +73,7 @@ class FormEntry:  # pylint disable=too-few-public-method
 
 
 class ComplianceJob(Job, FormEntry):
-    """Job to to run the compliance engine."""
+    """Job to run the compliance engine."""
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
@@ -107,7 +107,7 @@ class ComplianceJob(Job, FormEntry):
 
 
 class IntendedJob(Job, FormEntry):
-    """Job to to run generation of intended configurations."""
+    """Job to run generation of intended configurations."""
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
@@ -152,7 +152,7 @@ class IntendedJob(Job, FormEntry):
 
 
 class BackupJob(Job, FormEntry):
-    """Job to to run the backup job."""
+    """Job to run the backup job."""
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
@@ -196,7 +196,7 @@ class BackupJob(Job, FormEntry):
 
 
 class AllGoldenConfig(Job):
-    """Job to to run all three jobs against a single device."""
+    """Job to run all three jobs against a single device."""
 
     device = ObjectVar(model=Device, required=True)
     debug = BooleanVar(description="Enable for more verbose debug logging")
@@ -219,7 +219,7 @@ class AllGoldenConfig(Job):
 
 
 class AllDevicesGoldenConfig(Job):
-    """Job to to run all three jobs against multiple devices."""
+    """Job to run all three jobs against multiple devices."""
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
