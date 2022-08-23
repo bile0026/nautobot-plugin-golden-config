@@ -249,7 +249,7 @@ namespace.configure(
     {
         "nautobot_golden_config": {
             ...
-            "python_ver": "3.7",
+            "python_ver": "3.8",
 	    ...
         }
     }
