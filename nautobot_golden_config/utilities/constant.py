@@ -5,12 +5,14 @@ PLUGIN_CFG = settings.PLUGINS_CONFIG["nautobot_golden_config"]
 
 ENABLE_INTENDED = PLUGIN_CFG["enable_intended"]
 ENABLE_COMPLIANCE = PLUGIN_CFG["enable_compliance"]
+ENABLE_REMEDIATION = PLUGIN_CFG["enable_remediation"]
 ENABLE_BACKUP = PLUGIN_CFG["enable_backup"]
 ENABLE_SOTAGG = PLUGIN_CFG["enable_sotagg"]
 
 CONFIG_FEATURES = {
     "intended": ENABLE_INTENDED,
     "compliance": ENABLE_COMPLIANCE,
+    "remediation": ENABLE_REMEDIATION,
     "backup": ENABLE_BACKUP,
     "sotagg": ENABLE_SOTAGG,
 }

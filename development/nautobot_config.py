@@ -167,6 +167,7 @@ PLUGINS_CONFIG = {
         "enable_backup": is_truthy(os.environ.get("ENABLE_BACKUP", True)),
         "enable_compliance": is_truthy(os.environ.get("ENABLE_COMPLIANCE", True)),
         "enable_intended": is_truthy(os.environ.get("ENABLE_INTENDED", True)),
+        "enable_remediation": is_truthy(os.environ.get("ENABLE_REMEDIATON", True)),
         "enable_sotagg": is_truthy(os.environ.get("ENABLE_SOTAGG", True)),
         "sot_agg_transposer": os.environ.get("SOT_AGG_TRANSPOSER"),
         # The platform_slug_map maps an arbitrary platform slug to its corresponding parser.

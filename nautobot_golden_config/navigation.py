@@ -2,7 +2,7 @@
 
 from nautobot.core.apps import NavMenuGroup, NavMenuItem, NavMenuTab, NavMenuButton
 from nautobot.utilities.choices import ButtonColorChoices
-from nautobot_golden_config.utilities.constant import ENABLE_COMPLIANCE, ENABLE_BACKUP
+from nautobot_golden_config.utilities.constant import ENABLE_COMPLIANCE, ENABLE_BACKUP, ENABLE_REMEDIATION
 
 items = [
     NavMenuItem(
@@ -89,6 +89,25 @@ if ENABLE_BACKUP:
                     icon_class="mdi mdi-plus-thick",
                     button_class=ButtonColorChoices.GREEN,
                     permissions=["nautobot_golden_config.add_configreplace"],
+                ),
+            ),
+        )
+    )
+
+if ENABLE_REMEDIATION:
+    items.append(
+        NavMenuItem(
+            link="plugins:nautobot_golden_config:configremediation_list",
+            name="Config Remediations",
+            permissions=["plugins:nautobot_golden_config:configremediation"],
+            buttons=(
+                NavMenuButton(
+                    link="plugins:nautobot_golden_config:configremediation_add",
+                    title="Config Remediation",
+                    icon_class="mdi mdi-plus-thick",
+                    button_class=ButtonColorChoices.GREEN,
+                    #FIXME: Need a new permission for config remediation
+                    permissions=["nautobot_golden_config.view_configcompliance"],
                 ),
             ),
         )

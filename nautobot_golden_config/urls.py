@@ -158,4 +158,5 @@ urlpatterns = [
         name="configreplace_changelog",
         kwargs={"model": models.ConfigReplace},
     ),
+    path("config-remediation/", views.ConfigRemediationListView.as_view(), name="configremediation_list"),
 ]

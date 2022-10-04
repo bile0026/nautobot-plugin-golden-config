@@ -370,6 +370,10 @@ class GoldenConfig(PrimaryModel):  # pylint: disable=too-many-ancestors
     compliance_last_attempt_date = models.DateTimeField(null=True)
     compliance_last_success_date = models.DateTimeField(null=True)
 
+    remediation_config = models.TextField(blank=True, help_text="Proposed remediation config for device.")
+    remediation_last_attempt_date = models.DateTimeField(null=True)
+    remediation_last_success_date = models.DateTimeField(null=True)
+
     csv_headers = [
         "Device Name",
         "backup attempt",
@@ -378,6 +382,8 @@ class GoldenConfig(PrimaryModel):  # pylint: disable=too-many-ancestors
         "intended successful",
         "compliance attempt",
         "compliance successful",
+        "remediation attempt",
+        "remediation success"
     ]
 
     def to_csv(self):
@@ -390,12 +396,14 @@ class GoldenConfig(PrimaryModel):  # pylint: disable=too-many-ancestors
             self.intended_last_success_date,
             self.compliance_last_attempt_date,
             self.compliance_last_success_date,
+            self.remediation_last_attempt_date,
+            self.remediation_last_success_date
         )
 
     def to_objectchange(self, action, related_object=None, object_data_extra=None, object_data_exclude=None):
         """Remove actual and intended configuration from changelog."""
         if not object_data_exclude:
-            object_data_exclude = ["backup_config", "intended_config", "compliance_config"]
+            object_data_exclude = ["backup_config", "intended_config", "compliance_config", "remediation_config"]
         return ObjectChange(
             changed_object=self,
             object_repr=str(self),

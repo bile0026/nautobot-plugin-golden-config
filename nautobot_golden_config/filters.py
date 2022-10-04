@@ -293,3 +293,7 @@ class GoldenConfigSettingFilterSet(BaseFilterSet, NameSlugSearchFilterSet):
 
         model = models.GoldenConfigSetting
         fields = ["id", "name", "slug", "weight", "backup_repository", "intended_repository", "jinja_repository"]
+
+class ConfigRemediationFilterSet(GenericPlatformFilterSet):
+    """Implementing"""
+    pass

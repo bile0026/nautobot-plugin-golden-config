@@ -42,7 +42,7 @@ RED = "#F8CECC"
 
 
 class GoldenConfigListView(generic.ObjectListView):
-    """View for displaying the configuration management status for backup, intended, diff, and SoT Agg."""
+    """View for displaying the configuration management status for backup, intended, remediation, diff, and SoT Agg."""
 
     table = tables.GoldenConfigTable
     filterset = DeviceFilterSet
@@ -64,12 +64,15 @@ class GoldenConfigListView(generic.ObjectListView):
             backup_config=F("goldenconfig__backup_config"),
             intended_config=F("goldenconfig__intended_config"),
             compliance_config=F("goldenconfig__compliance_config"),
+            remediation_config=F("goldenconfig__remediation_config"),
             backup_last_success_date=F("goldenconfig__backup_last_success_date"),
             intended_last_success_date=F("goldenconfig__intended_last_success_date"),
             compliance_last_success_date=F("goldenconfig__compliance_last_success_date"),
+            remediation_last_success_date=F("golden_config__remediation_last_success_date"),
             backup_last_attempt_date=F("goldenconfig__backup_last_attempt_date"),
             intended_last_attempt_date=F("goldenconfig__intended_last_attempt_date"),
             compliance_last_attempt_date=F("goldenconfig__compliance_last_attempt_date"),
+            remediation_last_attempt_date=F("goldenconfig__remediation_last_attempt_date"),
         )
 
     def queryset_to_csv(self):
@@ -180,6 +183,17 @@ class GoldenConfigBulkDeleteView(generic.BulkDeleteView):
             return self.form
 
         return BulkDeleteForm
+
+#
+# ConfigRemediation
+#
+
+class ConfigRemediationListView(generic.ObjectListView):
+    """Django View for vizualizing config remediation."""
+
+    action_buttons = ("export",)
+    filterset = filters.ConfigRemediationFilterSet
+
 
 
 #
