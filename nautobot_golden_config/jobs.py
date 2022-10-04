@@ -75,9 +75,42 @@ class FormEntry:  # pylint disable=too-few-public-method
     debug = BooleanVar(description="Enable for more verbose debug logging")
     # TODO: Add status
 
+class RemediationJob(Job, FormEntry):
+    """Job to run remediation with hier_config"""
+
+    tenant_group = FormEntry.tenant_group
+    tenant = FormEntry.tenant
+    region = FormEntry.region
+    site = FormEntry.site
+    rack_group = FormEntry.rack_group
+    rack = FormEntry.rack
+    role = FormEntry.role
+    manufacturer = FormEntry.manufacturer
+    platform = FormEntry.platform
+    device_type = FormEntry.device_type
+    device = FormEntry.device
+    tag = FormEntry.tag
+    debug = FormEntry.debug
+
+    class Meta:
+        """Meta object boilerplate for compliance."""
+
+        name = "Perform Configuration Remediation"
+        description = "Run configuration remediation on your network infrastructure."
+
+    @commit_check
+    def postrun(self, data, commit):  # pylint: disable=too-many-branches
+        """Run config remediation report script."""
+        # pylint: disable=unused-argument
+
+        get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=data)
+        get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=data)
+
+        config_compliance(self, data)
+
 
 class ComplianceJob(Job, FormEntry):
-    """Job to to run the compliance engine."""
+    """Job to run the compliance engine."""
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
@@ -100,7 +133,7 @@ class ComplianceJob(Job, FormEntry):
         description = "Run configuration compliance on your network infrastructure."
 
     @commit_check
-    def run(self, data, commit):  # pylint: disable=too-many-branches
+    def postrun(self, data, commit):  # pylint: disable=too-many-branches
         """Run config compliance report script."""
         # pylint: disable=unused-argument
 
@@ -111,7 +144,7 @@ class ComplianceJob(Job, FormEntry):
 
 
 class IntendedJob(Job, FormEntry):
-    """Job to to run generation of intended configurations."""
+    """Job to run generation of intended configurations."""
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
@@ -134,7 +167,7 @@ class IntendedJob(Job, FormEntry):
         description = "Generate the configuration for your intended state."
 
     @commit_check
-    def run(self, data, commit):
+    def postrun(self, data, commit):
         """Run config generation script."""
         now = datetime.now()
 
@@ -156,7 +189,7 @@ class IntendedJob(Job, FormEntry):
 
 
 class BackupJob(Job, FormEntry):
-    """Job to to run the backup job."""
+    """Job to run the backup job."""
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
@@ -179,7 +212,7 @@ class BackupJob(Job, FormEntry):
         description = "Backup the configurations of your network devices."
 
     @commit_check
-    def run(self, data, commit):
+    def postrun(self, data, commit):
         """Run config backup process."""
         now = datetime.now()
         LOGGER.debug("Pull Backup config repo.")
@@ -200,7 +233,7 @@ class BackupJob(Job, FormEntry):
 
 
 class AllGoldenConfig(Job):
-    """Job to to run all three jobs against a single device."""
+    """Job to run all three jobs against a single device."""
 
     device = ObjectVar(model=Device, required=True)
     debug = BooleanVar(description="Enable for more verbose debug logging")
@@ -212,7 +245,7 @@ class AllGoldenConfig(Job):
         description = "Process to run all Golden Configuration jobs configured."
 
     @commit_check
-    def run(self, data, commit):
+    def postrun(self, data, commit):
         """Run all jobs."""
         if ENABLE_INTENDED:
             IntendedJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
@@ -223,7 +256,7 @@ class AllGoldenConfig(Job):
 
 
 class AllDevicesGoldenConfig(Job):
-    """Job to to run all three jobs against multiple devices."""
+    """Job to run all three jobs against multiple devices."""
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
@@ -246,7 +279,7 @@ class AllDevicesGoldenConfig(Job):
         description = "Process to run all Golden Configuration jobs configured against multiple devices."
 
     @commit_check
-    def run(self, data, commit):
+    def postrun(self, data, commit):
         """Run all jobs."""
         if ENABLE_INTENDED:
             IntendedJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
