@@ -273,6 +273,9 @@ class AllGoldenConfig(Job):
     @commit_check
     def run(self, data, commit):
         """Run all jobs."""
+        self.data = data
+
+    def post_run(self):
         if ENABLE_INTENDED:
             intended = IntendedJob()
             intended.data = self.data
@@ -320,9 +323,11 @@ class AllDevicesGoldenConfig(Job):
         description = "Process to run all Golden Configuration jobs configured against multiple devices."
 
     @commit_check
-    def post_run(self, data, commit):
+    def run(self, data, commit):
         """Run all jobs."""
+        self.data = data
 
+    def post_run(self):
         if ENABLE_INTENDED:
             intended = IntendedJob()
             intended.data = self.data
