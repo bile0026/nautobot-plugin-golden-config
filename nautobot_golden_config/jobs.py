@@ -99,7 +99,7 @@ class RemediationJob(Job, FormEntry):
         description = "Run configuration remediation on your network infrastructure."
 
     @commit_check
-    def postrun(self, data, commit):  # pylint: disable=too-many-branches
+    def post_run(self, data, commit):  # pylint: disable=too-many-branches
         """Run config remediation report script."""
         # pylint: disable=unused-argument
 
@@ -133,7 +133,7 @@ class ComplianceJob(Job, FormEntry):
         description = "Run configuration compliance on your network infrastructure."
 
     @commit_check
-    def postrun(self, data, commit):  # pylint: disable=too-many-branches
+    def post_run(self, data, commit):  # pylint: disable=too-many-branches
         """Run config compliance report script."""
         # pylint: disable=unused-argument
 
@@ -167,7 +167,7 @@ class IntendedJob(Job, FormEntry):
         description = "Generate the configuration for your intended state."
 
     @commit_check
-    def postrun(self, data, commit):
+    def post_run(self, data, commit):
         """Run config generation script."""
         now = datetime.now()
 
@@ -212,7 +212,7 @@ class BackupJob(Job, FormEntry):
         description = "Backup the configurations of your network devices."
 
     @commit_check
-    def postrun(self, data, commit):
+    def post_run(self, data, commit):
         """Run config backup process."""
         now = datetime.now()
         LOGGER.debug("Pull Backup config repo.")
@@ -245,7 +245,7 @@ class AllGoldenConfig(Job):
         description = "Process to run all Golden Configuration jobs configured."
 
     @commit_check
-    def postrun(self, data, commit):
+    def run(self, data, commit):
         """Run all jobs."""
         if ENABLE_INTENDED:
             IntendedJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
@@ -279,7 +279,7 @@ class AllDevicesGoldenConfig(Job):
         description = "Process to run all Golden Configuration jobs configured against multiple devices."
 
     @commit_check
-    def postrun(self, data, commit):
+    def post_run(self, data, commit):
         """Run all jobs."""
         if ENABLE_INTENDED:
             IntendedJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
