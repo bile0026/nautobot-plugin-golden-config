@@ -190,11 +190,11 @@ class IntendedJob(Job, FormEntry):
         now = datetime.now()
 
         LOGGER.debug("Pull Jinja template repos.")
-        get_refreshed_repos(job_obj=self, repo_type="jinja_repository", data=data)
+        get_refreshed_repos(job_obj=self, repo_type="jinja_repository", data=self.data)
 
         LOGGER.debug("Pull Intended config repos.")
         # Instantiate a GitRepo object for each GitRepository in GoldenConfigSettings.
-        intended_repos = get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=data)
+        intended_repos = get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=self.data)
 
         LOGGER.debug("Run config intended nornir play.")
         config_intended(self, data)
