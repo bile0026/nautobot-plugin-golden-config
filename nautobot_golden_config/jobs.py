@@ -99,14 +99,21 @@ class RemediationJob(Job, FormEntry):
         description = "Run configuration remediation on your network infrastructure."
 
     @commit_check
-    def post_run(self, data, commit):  # pylint: disable=too-many-branches
+    def run(self, data, commit):  # pylint: disable=too-many-branches
         """Run config remediation report script."""
         # pylint: disable=unused-argument
+        self.data = data
+
+    def post_run(self):
+        self.completed = None
+        now = datetime.now()
 
         get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=data)
         get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=data)
 
         config_compliance(self, data)
+
+        self.completed = datetime.now()
 
 
 class ComplianceJob(Job, FormEntry):
@@ -133,14 +140,21 @@ class ComplianceJob(Job, FormEntry):
         description = "Run configuration compliance on your network infrastructure."
 
     @commit_check
-    def post_run(self, data, commit):  # pylint: disable=too-many-branches
+    def run(self, data, commit):  # pylint: disable=too-many-branches
         """Run config compliance report script."""
         # pylint: disable=unused-argument
+        self.data = data
+
+    def post_run(self):
+        self.completed = None
+        now = datetime.now()
 
         get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=data)
         get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=data)
 
         config_compliance(self, data)
+
+        self.completed = datetime.now()
 
 
 class IntendedJob(Job, FormEntry):
@@ -167,8 +181,12 @@ class IntendedJob(Job, FormEntry):
         description = "Generate the configuration for your intended state."
 
     @commit_check
-    def post_run(self, data, commit):
+    def run(self, data, commit):
         """Run config generation script."""
+        self.data = data
+
+    def post_run(self):
+        self.completed = None
         now = datetime.now()
 
         LOGGER.debug("Pull Jinja template repos.")
@@ -186,6 +204,8 @@ class IntendedJob(Job, FormEntry):
             LOGGER.debug("Push new intended configs to repo %s.", intended_repo.url)
             intended_repo.commit_with_added(f"INTENDED CONFIG CREATION JOB - {now}")
             intended_repo.push()
+
+        self.completed = datetime.now()
 
 
 class BackupJob(Job, FormEntry):
@@ -212,24 +232,30 @@ class BackupJob(Job, FormEntry):
         description = "Backup the configurations of your network devices."
 
     @commit_check
-    def post_run(self, data, commit):
+    def run(self, data, commit):
         """Run config backup process."""
+        self.data = data
+
+    def post_run(self):
+        self.completed = None
         now = datetime.now()
         LOGGER.debug("Pull Backup config repo.")
 
         # Instantiate a GitRepo object for each GitRepository in GoldenConfigSettings.
-        backup_repos = get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=data)
+        backup_repos = get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=self.data)
 
         LOGGER.debug("Starting backup jobs to the following repos: %s", backup_repos)
 
         LOGGER.debug("Run nornir play.")
-        config_backup(self, data)
+        config_backup(self, self.data)
 
         # Commit / Push each repo after job is completed.
         for backup_repo in backup_repos:
             LOGGER.debug("Pushing Backup config repo %s.", backup_repo.url)
             backup_repo.commit_with_added(f"BACKUP JOB {now}")
             backup_repo.push()
+
+        self.completed = datetime.now()
 
 
 class AllGoldenConfig(Job):
@@ -245,14 +271,29 @@ class AllGoldenConfig(Job):
         description = "Process to run all Golden Configuration jobs configured."
 
     @commit_check
-    def post_run(self, data, commit):
+    def run(self, data, commit):
         """Run all jobs."""
         if ENABLE_INTENDED:
-            IntendedJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+            intended = IntendedJob()
+            intended.data = self.data
+            intended.post_run.__func__(self)
+
         if ENABLE_BACKUP:
-            BackupJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+            backup = BackupJob()
+            backup.data = self.data
+            backup.post_run.__func__(self)
+
         if ENABLE_COMPLIANCE:
-            ComplianceJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+            compliance = ComplianceJob()
+            compliance.data = self.data
+            compliance.post_run.__func__(self)
+
+        # if ENABLE_INTENDED:
+        #     IntendedJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+        # if ENABLE_BACKUP:
+        #     BackupJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+        # if ENABLE_COMPLIANCE:
+        #     ComplianceJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
 
 
 class AllDevicesGoldenConfig(Job):
@@ -281,12 +322,28 @@ class AllDevicesGoldenConfig(Job):
     @commit_check
     def post_run(self, data, commit):
         """Run all jobs."""
+
         if ENABLE_INTENDED:
-            IntendedJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+            intended = IntendedJob()
+            intended.data = self.data
+            intended.post_run.__func__(self)
+
         if ENABLE_BACKUP:
-            BackupJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+            backup = BackupJob()
+            backup.data = self.data
+            backup.post_run.__func__(self)
+
         if ENABLE_COMPLIANCE:
-            ComplianceJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+            compliance = ComplianceJob()
+            compliance.data = self.data
+            compliance.post_run.__func__(self)
+
+        # if ENABLE_INTENDED:
+        #     IntendedJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+        # if ENABLE_BACKUP:
+        #     BackupJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
+        # if ENABLE_COMPLIANCE:
+        #     ComplianceJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
 
 
 # Conditionally allow jobs based on whether or not turned on.
