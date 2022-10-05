@@ -245,7 +245,7 @@ class AllGoldenConfig(Job):
         description = "Process to run all Golden Configuration jobs configured."
 
     @commit_check
-    def run(self, data, commit):
+    def post_run(self, data, commit):
         """Run all jobs."""
         if ENABLE_INTENDED:
             IntendedJob().run.__func__(self, data, True)  # pylint: disable=too-many-function-args
