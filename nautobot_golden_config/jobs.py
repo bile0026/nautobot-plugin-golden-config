@@ -152,7 +152,7 @@ class ComplianceJob(Job, FormEntry):
         get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=data)
         get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=data)
 
-        config_compliance(self, data)
+        config_compliance(self, self.data)
 
         self.completed = datetime.now()
 
@@ -276,17 +276,17 @@ class AllGoldenConfig(Job):
         self.data = data
 
     def post_run(self):
-        if ENABLE_INTENDED:
+        #if ENABLE_INTENDED:
             intended = IntendedJob()
             intended.data = self.data
             intended.post_run.__func__(self)
 
-        if ENABLE_BACKUP:
+        #if ENABLE_BACKUP:
             backup = BackupJob()
             backup.data = self.data
             backup.post_run.__func__(self)
 
-        if ENABLE_COMPLIANCE:
+        #if ENABLE_COMPLIANCE:
             compliance = ComplianceJob()
             compliance.data = self.data
             compliance.post_run.__func__(self)
@@ -328,17 +328,17 @@ class AllDevicesGoldenConfig(Job):
         self.data = data
 
     def post_run(self):
-        if ENABLE_INTENDED:
+        #if ENABLE_INTENDED:
             intended = IntendedJob()
             intended.data = self.data
             intended.post_run.__func__(self)
 
-        if ENABLE_BACKUP:
+        #if ENABLE_BACKUP:
             backup = BackupJob()
             backup.data = self.data
             backup.post_run.__func__(self)
 
-        if ENABLE_COMPLIANCE:
+        #if ENABLE_COMPLIANCE:
             compliance = ComplianceJob()
             compliance.data = self.data
             compliance.post_run.__func__(self)
