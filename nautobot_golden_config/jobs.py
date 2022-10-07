@@ -107,12 +107,16 @@ class ComplianceJob(Job, FormEntry):
         self.commit = commit
 
     def post_run(self):
+        self.log_debug("Starting ComplianceJob process.")
         self.completed = None
         now = datetime.now()
 
+        self.log_debug("Pull intended config repos.")
         get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=self.data)
+        self.log_debug("Pull backup config repos.")
         get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=self.data)
 
+        self.log_debug("Run config compliance nornir play.")
         config_compliance(self, self.data)
 
         self.completed = datetime.now()
@@ -148,22 +152,27 @@ class IntendedJob(Job, FormEntry):
         self.commit = commit
 
     def post_run(self):
+        self.log_debug("Starting IntendedJob process.")
+
         self.completed = None
         now = datetime.now()
 
-        LOGGER.debug("Pull Jinja template repos.")
+        self.log_debug("Pull Jinja template repos.")
+
+
+        self.log_debug("Pull Jinja template repos.")
         get_refreshed_repos(job_obj=self, repo_type="jinja_repository", data=self.data)
 
-        LOGGER.debug("Pull Intended config repos.")
+        self.log_debug("Pull Intended config repos.")
         # Instantiate a GitRepo object for each GitRepository in GoldenConfigSettings.
         intended_repos = get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=self.data)
 
-        LOGGER.debug("Run config intended nornir play.")
+        self.log_debug("Run config intended nornir play.")
         config_intended(self, self.data)
 
         # Commit / Push each repo after job is completed.
         for intended_repo in intended_repos:
-            LOGGER.debug("Push new intended configs to repo %s.", intended_repo.url)
+            self.log_debug("Push new intended configs to repo %s.", intended_repo.url)
             intended_repo.commit_with_added(f"INTENDED CONFIG CREATION JOB - {now}")
             intended_repo.push()
 
@@ -200,21 +209,22 @@ class BackupJob(Job, FormEntry):
         self.commit = commit
 
     def post_run(self):
+        self.log_debug("Starting BackupJob process.")
         self.completed = None
         now = datetime.now()
-        LOGGER.debug("Pull Backup config repo.")
+        self.log_debug("Pull Backup config repo.")
 
         # Instantiate a GitRepo object for each GitRepository in GoldenConfigSettings.
         backup_repos = get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=self.data)
 
-        LOGGER.debug("Starting backup jobs to the following repos: %s", backup_repos)
+        self.log_debug("Starting backup jobs to the following repos: %s", backup_repos)
 
-        LOGGER.debug("Run nornir play.")
+        self.log_debug("Run backup nornir play.")
         config_backup(self, self.data)
 
         # Commit / Push each repo after job is completed.
         for backup_repo in backup_repos:
-            LOGGER.debug("Pushing Backup config repo %s.", backup_repo.url)
+            self.log_debug("Pushing Backup config repo %s.", backup_repo.url)
             backup_repo.commit_with_added(f"BACKUP JOB {now}")
             backup_repo.push()
 
@@ -241,19 +251,19 @@ class AllGoldenConfig(Job):
 
     def post_run(self):
         if ENABLE_INTENDED:
-            self.log_debug("Running intended job.")
+            self.log_debug("Running AllGoldenConfig intended job.")
             intended = IntendedJob()
             intended.data = self.data
             intended.post_run.__func__(self)
 
         if ENABLE_BACKUP:
-            self.log_debug("Running backup job.")
+            self.log_debug("Running AllGoldenConfig backup job.")
             backup = BackupJob()
             backup.data = self.data
             backup.post_run.__func__(self)
 
         if ENABLE_COMPLIANCE:
-            self.log_debug("Running compliance job.")
+            self.log_debug("Running AllGoldenConfig compliance job.")
             compliance = ComplianceJob()
             compliance.data = self.data
             compliance.post_run.__func__(self)
@@ -297,19 +307,19 @@ class AllDevicesGoldenConfig(Job):
 
     def post_run(self):
         if ENABLE_INTENDED:
-            self.log_debug("Running intended job.")
+            self.log_debug("Running AllDevicesGoldenConifig intended job.")
             intended = IntendedJob()
             intended.data = self.data
             intended.post_run.__func__(self)
 
         if ENABLE_BACKUP:
-            self.log_debug("Running backup job.")
+            self.log_debug("Running AllDevicesGoldenConifig backup job.")
             backup = BackupJob()
             backup.data = self.data
             backup.post_run.__func__(self)
 
         if ENABLE_COMPLIANCE:
-            self.log_debug("Running compliance job.")
+            self.log_debug("Running AllDevicesGoldenConifig compliance job.")
             compliance = ComplianceJob()
             compliance.data = self.data
             compliance.post_run.__func__(self)
