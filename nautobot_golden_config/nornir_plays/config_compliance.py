@@ -154,7 +154,7 @@ def config_compliance(job_result, data):
     try:
         with InitNornir(
             runner=NORNIR_SETTINGS.get("runner"),
-            logging={"enabled": False},
+            logging={"enabled": True},
             inventory={
                 "plugin": "nautobot-inventory",
                 "options": {
