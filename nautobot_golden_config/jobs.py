@@ -277,16 +277,19 @@ class AllGoldenConfig(Job):
 
     def post_run(self):
         if ENABLE_INTENDED:
+            LOGGER.debug("Running intended job.")
             intended = IntendedJob()
             intended.data = self.data
             intended.post_run.__func__(self)
 
         if ENABLE_BACKUP:
+            LOGGER.debug("Running backup job.")
             backup = BackupJob()
             backup.data = self.data
             backup.post_run.__func__(self)
 
         if ENABLE_COMPLIANCE:
+            LOGGER.debug("Running compliance job.")
             compliance = ComplianceJob()
             compliance.data = self.data
             compliance.post_run.__func__(self)
@@ -329,16 +332,19 @@ class AllDevicesGoldenConfig(Job):
 
     def post_run(self):
         if ENABLE_INTENDED:
+            LOGGER.debug("Running intended job.")
             intended = IntendedJob()
             intended.data = self.data
             intended.post_run.__func__(self)
 
         if ENABLE_BACKUP:
+            LOGGER.debug("Running backup job.")
             backup = BackupJob()
             backup.data = self.data
             backup.post_run.__func__(self)
 
         if ENABLE_COMPLIANCE:
+            LOGGER.debug("Running compliance job.")
             compliance = ComplianceJob()
             compliance.data = self.data
             compliance.post_run.__func__(self)
