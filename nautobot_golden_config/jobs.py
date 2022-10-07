@@ -103,6 +103,7 @@ class RemediationJob(Job, FormEntry):
         """Run config remediation report script."""
         # pylint: disable=unused-argument
         self.data = data
+        self.commit = commit
 
     def post_run(self):
         self.completed = None
@@ -144,6 +145,7 @@ class ComplianceJob(Job, FormEntry):
         """Run config compliance report script."""
         # pylint: disable=unused-argument
         self.data = data
+        self.commit = commit
 
     def post_run(self):
         self.completed = None
@@ -184,6 +186,7 @@ class IntendedJob(Job, FormEntry):
     def run(self, data, commit):
         """Run config generation script."""
         self.data = data
+        self.commit = commit
 
     def post_run(self):
         self.completed = None
@@ -235,6 +238,7 @@ class BackupJob(Job, FormEntry):
     def run(self, data, commit):
         """Run config backup process."""
         self.data = data
+        self.commit = commit
 
     def post_run(self):
         self.completed = None
@@ -274,22 +278,23 @@ class AllGoldenConfig(Job):
     def run(self, data, commit):
         """Run all jobs."""
         self.data = data
+        self.commit = commit
 
     def post_run(self):
         if ENABLE_INTENDED:
-            LOGGER.debug("Running intended job.")
+            self.log_debug("Running intended job.")
             intended = IntendedJob()
             intended.data = self.data
             intended.post_run.__func__(self)
 
         if ENABLE_BACKUP:
-            LOGGER.debug("Running backup job.")
+            self.log_debug("Running backup job.")
             backup = BackupJob()
             backup.data = self.data
             backup.post_run.__func__(self)
 
         if ENABLE_COMPLIANCE:
-            LOGGER.debug("Running compliance job.")
+            self.log_debug("Running compliance job.")
             compliance = ComplianceJob()
             compliance.data = self.data
             compliance.post_run.__func__(self)
@@ -329,22 +334,23 @@ class AllDevicesGoldenConfig(Job):
     def run(self, data, commit):
         """Run all jobs."""
         self.data = data
+        self.commit = commit
 
     def post_run(self):
         if ENABLE_INTENDED:
-            LOGGER.debug("Running intended job.")
+            self.log_debug("Running intended job.")
             intended = IntendedJob()
             intended.data = self.data
             intended.post_run.__func__(self)
 
         if ENABLE_BACKUP:
-            LOGGER.debug("Running backup job.")
+            self.log_debug("Running backup job.")
             backup = BackupJob()
             backup.data = self.data
             backup.post_run.__func__(self)
 
         if ENABLE_COMPLIANCE:
-            LOGGER.debug("Running compliance job.")
+            self.log_debug("Running compliance job.")
             compliance = ComplianceJob()
             compliance.data = self.data
             compliance.post_run.__func__(self)
