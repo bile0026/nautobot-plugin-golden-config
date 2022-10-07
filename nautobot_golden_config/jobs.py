@@ -75,47 +75,6 @@ class FormEntry:  # pylint disable=too-few-public-method
     debug = BooleanVar(description="Enable for more verbose debug logging")
     # TODO: Add status
 
-class RemediationJob(Job, FormEntry):
-    """Job to run remediation with hier_config"""
-
-    tenant_group = FormEntry.tenant_group
-    tenant = FormEntry.tenant
-    region = FormEntry.region
-    site = FormEntry.site
-    rack_group = FormEntry.rack_group
-    rack = FormEntry.rack
-    role = FormEntry.role
-    manufacturer = FormEntry.manufacturer
-    platform = FormEntry.platform
-    device_type = FormEntry.device_type
-    device = FormEntry.device
-    tag = FormEntry.tag
-    debug = FormEntry.debug
-
-    class Meta:
-        """Meta object boilerplate for compliance."""
-
-        name = "Perform Configuration Remediation"
-        description = "Run configuration remediation on your network infrastructure."
-
-    @commit_check
-    def run(self, data, commit):  # pylint: disable=too-many-branches
-        """Run config remediation report script."""
-        # pylint: disable=unused-argument
-        self.data = data
-        self.commit = commit
-
-    def post_run(self):
-        self.completed = None
-        now = datetime.now()
-
-        get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=data)
-        get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=data)
-
-        config_compliance(self, data)
-
-        self.completed = datetime.now()
-
 
 class ComplianceJob(Job, FormEntry):
     """Job to run the compliance engine."""
@@ -151,8 +110,8 @@ class ComplianceJob(Job, FormEntry):
         self.completed = None
         now = datetime.now()
 
-        get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=data)
-        get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=data)
+        get_refreshed_repos(job_obj=self, repo_type="intended_repository", data=self.data)
+        get_refreshed_repos(job_obj=self, repo_type="backup_repository", data=self.data)
 
         config_compliance(self, self.data)
 
