@@ -112,9 +112,12 @@ def config_intended(nautobot_job, data):
     now = datetime.now()
     logger = NornirLogger(__name__, nautobot_job, data.get("debug"))
 
+    print("BASIC_LOGGING: Set job filter variable qs.")
     qs = get_job_filter(data)
+    print("BASIC_LOGGING: Set device_to_settings_map variable.")
     device_to_settings_map = get_device_to_settings_map(queryset=qs)
 
+    print("BASIC_LOGGING: Setup device to settings map")
     for settings in set(device_to_settings_map.values()):
         verify_settings(logger, settings, ["jinja_path_template", "intended_path_template", "sot_agg_query"])
 
