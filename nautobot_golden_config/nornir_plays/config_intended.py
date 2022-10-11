@@ -75,7 +75,7 @@ def run_template(  # pylint: disable=too-many-arguments
         )
     task.host.data.update(device_data)
 
-    logger.log_debug(obj, "Starting rendering jinja template for intended configuration generation.")
+    print("BASIC_LOGGING: Starting rendering jinja template for intended configuration generation.")
     generated_config = task.run(
         task=dispatcher,
         name="GENERATE CONFIG",
@@ -90,7 +90,7 @@ def run_template(  # pylint: disable=too-many-arguments
     )[1].result["config"]
     intended_obj.intended_last_success_date = task.host.defaults.data["now"]
     intended_obj.intended_config = generated_config
-    logger.log_debug(obj, "Completed rendering jinja template for intended configuration, saving result.")
+    print("BASIC_LOGGING: Completed rendering jinja template for intended configuration, saving result.")
     intended_obj.save()
 
     logger.log_success(obj, "Successfully generated the intended configuration.")
@@ -119,7 +119,7 @@ def config_intended(nautobot_job, data):
         verify_settings(logger, settings, ["jinja_path_template", "intended_path_template", "sot_agg_query"])
 
     try:
-        logger.log_debug(obj, "Initialize nornir settings")
+        print("BASIC_LOGGING: Initialize nornir settings")
         with InitNornir(
             runner=NORNIR_SETTINGS.get("runner"),
             logging={"enabled": True},
@@ -137,7 +137,7 @@ def config_intended(nautobot_job, data):
             nr_with_processors = nornir_obj.with_processors([ProcessGoldenConfig(logger)])
 
             # Run the Nornir Tasks
-            logger.log_debug(obj, "Run nornir render config tasks.")
+            print("BASIC_LOGGING: Run nornir render config tasks.")
             nr_with_processors.run(
                 task=run_template,
                 name="RENDER CONFIG",
@@ -145,7 +145,7 @@ def config_intended(nautobot_job, data):
                 device_to_settings_map=device_to_settings_map,
                 nautobot_job=nautobot_job,
             )
-            logger.log_debug(obj, "Completed nornir render config task.")
+            print("BASIC_LOGGING: Completed nornir render config task.")
 
     except Exception as err:
         logger.log_failure(None, err)
